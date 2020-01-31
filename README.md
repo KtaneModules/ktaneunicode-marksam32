@@ -1,1 +1,1 @@
-ktaneUnicode
+#[ModKit Wiki](../../wiki)
