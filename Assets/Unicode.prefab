@@ -1010,6 +1010,7 @@ GameObject:
   - component: {fileID: 114378277012233274}
   - component: {fileID: 114318811480646948}
   - component: {fileID: 114040703071360248}
+  - component: {fileID: 114208758079686862}
   m_Layer: 0
   m_Name: Unicode
   m_TagString: Untagged
@@ -5238,6 +5239,44 @@ MonoBehaviour:
   AllowSelectionWrapY: 0
   ForceSelectionHighlight: 0
   ForceInteractionHighlight: 0
+--- !u!114 &114208758079686862
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1901672056003148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20b4615c310c04c4796de884b18ef69b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Audio: {fileID: 114548272191047682}
+  Module: {fileID: 114318811480646948}
+  Info: {fileID: 114378277012233274}
+  Buttons:
+  - {fileID: 114634871651242130}
+  - {fileID: 114571158077874740}
+  - {fileID: 114368996713041082}
+  - {fileID: 114192200018596198}
+  - {fileID: 114263716005861902}
+  - {fileID: 114903904072859200}
+  - {fileID: 114878412355602026}
+  - {fileID: 114964672533540724}
+  - {fileID: 114015411486346970}
+  - {fileID: 114061283125328202}
+  - {fileID: 114300639178519838}
+  - {fileID: 114512187670206988}
+  - {fileID: 114079322770474590}
+  - {fileID: 114151263686760998}
+  - {fileID: 114405242466628730}
+  - {fileID: 114215599286342766}
+  UPlusButton: {fileID: 114321013314069888}
+  SymbolsScreen:
+  - {fileID: 102355666109010816}
+  - {fileID: 102662599093499050}
+  - {fileID: 102709378964851672}
+  - {fileID: 102179665218089100}
+  TextArray: {fileID: 102112933702246698}
 --- !u!114 &114215599286342766
 MonoBehaviour:
   m_ObjectHideFlags: 1
