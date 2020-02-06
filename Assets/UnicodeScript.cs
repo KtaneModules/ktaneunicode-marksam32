@@ -36,6 +36,35 @@ public class UnicodeScript : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        //IList<int> temp = new List<int> { 4, 1, 2, 3 };
+        //IList<SymbolInfo> si = new List<SymbolInfo>
+        //{
+        //    new SymbolInfo
+        //    {
+        //        Code = "1111",
+        //        Symbol = '1',
+        //    },
+        //    new SymbolInfo
+        //    {
+        //        Code = "2222",
+        //        Symbol = '2',
+        //    },
+        //    new SymbolInfo
+        //    {
+        //        Code = "3333",
+        //        Symbol = '3',
+        //    },
+        //    new SymbolInfo
+        //    {
+        //        Code = "4444",
+        //        Symbol = '4',
+        //    }
+        //};
+        //si = OrderBy(si, temp);
+
+        //Debug.LogFormat(string.Join(", ", si.Select(x => x.Code).ToArray()));
+        //Debug.LogFormat(string.Join(", ", si.Select(x => x.Symbol.ToString()).ToArray()));
+
         for (int i = 0; i < symbols.Length; ++i)
         {
             Symbols.Add(new SymbolInfo
@@ -56,11 +85,21 @@ public class UnicodeScript : MonoBehaviour
             SymbolsScreen[i].text = DisplaySymbols[i].ToString();
         }
 
-        UPlusButton.OnInteract += delegate
+         UPlusButton.OnInteract += delegate
          {
-             StartCoroutine("SolveAnimation", false);
+             StartCoroutine("SolveAnimation", true);
              return false;
          };
+
+        for(int i = 0; i < Buttons.Length; ++i)
+        {
+            var index = i;
+            Buttons[index].OnInteract += delegate
+            {
+                HandlePress(index);
+                return false;
+            };
+        }
     }
 
     private void DetermineCorrectOrder()
@@ -84,46 +123,55 @@ public class UnicodeScript : MonoBehaviour
 
     private void ApplyRules()
     {
+        List<int> sortOrder = new List<int>();
         if (Info.GetBatteryCount() == 2 && Info.IsIndicatorOn(Indicator.BOB) && SelectedSymbols.Any(x => x.Code.Contains("0")) && Has2B())
         {
-            return;
+            sortOrder = new List<int> { 1, 2, 3, 4 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (SelectedSymbols[2].Code.Contains("A") || SelectedSymbols[2].Code.Contains("B") || SelectedSymbols[2].Code.Contains("C"))
         {
-
+            sortOrder = new List<int> { 3, 4, 2, 1 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (SelectedSymbols[1].Code.Contains("1") || SelectedSymbols[1].Code.Contains("2") || SelectedSymbols[1].Code.Contains("3"))
         {
-
+            sortOrder = new List<int> { 3, 1, 4, 2 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (NumberOfDEFEven() ^ Info.GetPortCount() % 2 == 0)
         {
-
+            sortOrder = new List<int> { 2, 4, 1, 3 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (OddDigitsGraterThanFive())
         {
-
+            sortOrder = new List<int> { 1, 2, 4, 3 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (FirstSymbolHexValue())
         {
-
+            sortOrder = new List<int> { 4, 3, 2, 1 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (EdgeworkIsGraterThanDigits())
         {
-
+            sortOrder = new List<int> { 1, 4, 3, 2 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (!SelectedSymbols[3].Code.Contains(Info.GetSerialNumberNumbers().Last().ToString()))
         {
-
+            sortOrder = new List<int> { 2, 3, 4, 1 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
-        else if (SelectedSymbols.Select(x => x.Code).ToArray().Contains("G"))
+        else if (HasInCommonWithSerialNumber())
         {
 
         }
-        //Add rule 10 here
         else if (DigitsGraterThatLetters())
         {
-
+            sortOrder = new List<int> { 1, 3, 4, 2 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         //else if ()
         //{
@@ -131,9 +179,27 @@ public class UnicodeScript : MonoBehaviour
         //}
     }
 
+    private void HandlePress (int index)
+    {
+        Debug.LogFormat(index.ToString());
+    }
+
     private bool Has2B()
     {
         return string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "B".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase))  >= 2;
+    }
+
+    private bool HasInCommonWithSerialNumber()
+    {
+            var serialNumber = Info.GetSerialNumber().ToLowerInvariant().ToArray();
+            List<char> Letters = new List<char>();
+            foreach(char letter in serialNumber)
+            {
+                if (letter.Equals("a") || letter.Equals("b") || letter.Equals("c") || letter.Equals("d") || letter.Equals("e") || letter.Equals("f"))
+                {
+                    Letters.Add(letter);
+                }
+            }
     }
 
     private bool NumberOfDEFEven()
@@ -205,6 +271,11 @@ public class UnicodeScript : MonoBehaviour
                 yield return new WaitForSecondsRealtime(.1f);
             }
         }
+    }
+
+    private static IList<SymbolInfo> OrderBy(IList<SymbolInfo> selectedSymbols, IList<int> order)
+    {
+        return order.Select(x => selectedSymbols[x -1]).ToList();
     }
 
 	// Update is called once per frame
