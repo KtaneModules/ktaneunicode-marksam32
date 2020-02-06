@@ -2,6 +2,7 @@
 using Unicode;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections;
 using KModkit;
 using System;
 
@@ -29,6 +30,9 @@ public class UnicodeScript : MonoBehaviour
     private int _moduleId = 0;
     private bool isSolved = false;
 
+    private readonly string CorrectText = "That is correct, good job! :D";
+    private readonly string WrongText = "That is incorrect, bad job! D:";
+
     // Use this for initialization
     void Start()
     {
@@ -51,6 +55,12 @@ public class UnicodeScript : MonoBehaviour
         {
             SymbolsScreen[i].text = DisplaySymbols[i].ToString();
         }
+
+        UPlusButton.OnInteract += delegate
+         {
+             StartCoroutine("SolveAnimation", false);
+             return false;
+         };
     }
 
     private void DetermineCorrectOrder()
@@ -106,7 +116,19 @@ public class UnicodeScript : MonoBehaviour
         {
 
         }
-        else if()
+        else if (SelectedSymbols.Select(x => x.Code).ToArray().Contains("G"))
+        {
+
+        }
+        //Add rule 10 here
+        else if (DigitsGraterThatLetters())
+        {
+
+        }
+        //else if ()
+        //{
+
+        //}
     }
 
     private bool Has2B()
@@ -144,9 +166,45 @@ public class UnicodeScript : MonoBehaviour
     private bool EdgeworkIsGraterThanDigits()
     {
         int edgework = Info.GetPortCount() + Info.GetIndicators().Count() + Info.GetBatteryCount();
-        int symbolDigits = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "1".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "2".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "3".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "4".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "5".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "6".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "7".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "8".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "9".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
+        int symbolDigits = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "1".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "2".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "3".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "4".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "5".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "6".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "7".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "8".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "9".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "0".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
 
         return edgework > symbolDigits;
+    }
+
+    private bool DigitsGraterThatLetters()
+    {
+        int letters = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "A".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "B".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "C".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "D".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "E".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "F".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
+        int digits = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "1".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "2".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "3".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "4".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "5".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "6".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "7".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "8".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "9".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "0".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
+        return digits > letters;
+    }
+
+    private IEnumerator SolveAnimation(bool correct)
+    {
+        TextArray.text = "";
+
+        yield return new WaitForSecondsRealtime(.1f);
+        if (correct)
+        {
+            var CorrectTextChar = CorrectText.ToCharArray();
+            string text = "";
+            for (int i = 0; i < CorrectTextChar.Length; ++i)
+            {
+                text = text + CorrectTextChar[i];
+                TextArray.text = text;
+                yield return new WaitForSecondsRealtime(.1f);
+            }
+        }
+        else
+        {
+            var WrongTextChar = WrongText.ToCharArray();
+            string text = "";
+            for (int i = 0; i < WrongTextChar.Length; ++i)
+            {
+                text = text + WrongTextChar[i];
+                TextArray.text = text;
+                yield return new WaitForSecondsRealtime(.1f);
+            }
+        }
     }
 
 	// Update is called once per frame
