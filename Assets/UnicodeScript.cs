@@ -22,13 +22,15 @@ public class UnicodeScript : MonoBehaviour
 
     private IList<SymbolInfo> SelectedSymbols = new List<SymbolInfo>();
 
-    private readonly char[] symbols = new char[44] { '§', '¶', 'Ħ', 'Ӕ', 'ſ', 'Ƕ', 'Ƿ', '⁂', 'ͼ', 'ς', 'Ћ', '₪', 'Ю', 'Ѡ', 'Ѭ', '₰', '∯', '∫', '╩', 'Ӭ', '☊', '֍', '☦', 'ﬡ', '⚙', 'Ω', 'ꀍ', '▒', '╋', '⌘', '∴', '∅', '℄', 'Ҩ', '★', 'ƛ', 'Ϫ', 'ت', 'ټ', 'غ', 'ں', 'þ', 'Ɣ', 'ȹ' };
-    private readonly string[] codes = new string[44] { "00A7", "00B6", "0126", "04D4", "017F", "01F6", "01F7", "2042", "037C", "03C2", "040B", "20AA", "042E", "0460", "046C", "20B0", "222F", "222B", "2569", "04EC", "260A", "058D", "2626", "FB21", "2699", "03A9", "A00D", "2592", "254B", "2318", "2234", "2205", "2104", "04A8", "2605", "019B", "03EA", "062A", "067C", "063A", "06BA", "00FE", "0194", "0239" };
+    private readonly char[] symbols = new char[44] { '§', '¶', 'Ħ', 'Ӕ', 'ſ', 'Ƕ', 'Ƿ', '⁂', 'ͼ', 'ς', 'Ћ', '₪', 'Ю', 'Ѡ', 'Ѭ', '₰', '∯', '∫', '╩', 'Ӭ', '☊', '֍', '☦', 'ﬡ', 'ш', 'Ω', 'փ', '▒', '╋', '⌘', '∴', '∅', '℄', 'Ҩ', '★', 'ƛ', 'Ϫ', 'ت', 'ټ', 'غ', 'ں', 'þ', 'Ɣ', 'ȹ' };
+    private readonly string[] codes = new string[44] { "00A7", "00B6", "0126", "04D4", "017F", "01F6", "01F7", "2042", "037C", "03C2", "040B", "20AA", "042E", "0460", "046C", "20B0", "222F", "222B", "2569", "04EC", "260A", "058D", "2626", "FB21", "0448", "03A9", "0583", "2592", "254B", "2318", "2234", "2205", "2104", "04A8", "2605", "019B", "03EA", "062A", "067C", "063A", "06BA", "00FE", "0194", "0239" };
     private List<char> DisplaySymbols = new List<char>();
 
     private static int _moduleIdCounter = 1; 
     private int _moduleId = 0;
     private bool isSolved = false;
+
+    private static readonly List<char> AllowedSerialNumberLetters = new List<char> { 'a', 'b', 'c', 'd', 'e', 'f' };
 
     private readonly string CorrectText = "That is correct, good job! :D";
     private readonly string WrongText = "That is incorrect, bad job! D:";
@@ -64,7 +66,7 @@ public class UnicodeScript : MonoBehaviour
 
         //Debug.LogFormat(string.Join(", ", si.Select(x => x.Code).ToArray()));
         //Debug.LogFormat(string.Join(", ", si.Select(x => x.Symbol.ToString()).ToArray()));
-
+        
         for (int i = 0; i < symbols.Length; ++i)
         {
             Symbols.Add(new SymbolInfo
@@ -85,7 +87,7 @@ public class UnicodeScript : MonoBehaviour
             SymbolsScreen[i].text = DisplaySymbols[i].ToString();
         }
 
-         UPlusButton.OnInteract += delegate
+        UPlusButton.OnInteract += delegate
          {
              StartCoroutine("SolveAnimation", true);
              return false;
@@ -166,17 +168,14 @@ public class UnicodeScript : MonoBehaviour
         }
         else if (HasInCommonWithSerialNumber())
         {
-
+            sortOrder = new List<int> { 4, 1, 2, 3 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (DigitsGraterThatLetters())
         {
             sortOrder = new List<int> { 1, 3, 4, 2 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
-        //else if ()
-        //{
-
-        //}
     }
 
     private void HandlePress (int index)
@@ -191,15 +190,23 @@ public class UnicodeScript : MonoBehaviour
 
     private bool HasInCommonWithSerialNumber()
     {
-            var serialNumber = Info.GetSerialNumber().ToLowerInvariant().ToArray();
-            List<char> Letters = new List<char>();
-            foreach(char letter in serialNumber)
-            {
-                if (letter.Equals("a") || letter.Equals("b") || letter.Equals("c") || letter.Equals("d") || letter.Equals("e") || letter.Equals("f"))
-                {
-                    Letters.Add(letter);
-                }
-            }
+        var codes = string.Join(string.Empty, SelectedSymbols.Take(2).Select(x => x.Code).ToArray()).ToLowerInvariant().ToArray();
+        var remainingCodes = AllowedSerialNumberLetters.Where(x => codes.Contains(x)).ToList();
+
+        if (remainingCodes.Count == 0)
+        {
+            return false;
+        }
+
+        var serialNumber = Info.GetSerialNumber().ToLowerInvariant().ToArray();
+        var remainingSerialLetters = AllowedSerialNumberLetters.Where(x => serialNumber.Contains(x)).ToList();
+
+        if (remainingSerialLetters.Count == 0)
+        {
+            return false;
+        }
+
+        return remainingSerialLetters.Except(remainingCodes).Count() == 0;
     }
 
     private bool NumberOfDEFEven()
@@ -212,7 +219,7 @@ public class UnicodeScript : MonoBehaviour
         NumberOfE = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "E".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
         NumberOfF = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "F".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
 
-        return NumberOfD + NumberOfE + NumberOfE % 2 == 0;
+        return NumberOfD + NumberOfE + NumberOfF % 2 == 0;
     }
 
     private bool OddDigitsGraterThanFive()
