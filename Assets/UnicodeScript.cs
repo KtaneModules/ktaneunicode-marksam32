@@ -37,36 +37,7 @@ public class UnicodeScript : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {
-        //IList<int> temp = new List<int> { 4, 1, 2, 3 };
-        //IList<SymbolInfo> si = new List<SymbolInfo>
-        //{
-        //    new SymbolInfo
-        //    {
-        //        Code = "1111",
-        //        Symbol = '1',
-        //    },
-        //    new SymbolInfo
-        //    {
-        //        Code = "2222",
-        //        Symbol = '2',
-        //    },
-        //    new SymbolInfo
-        //    {
-        //        Code = "3333",
-        //        Symbol = '3',
-        //    },
-        //    new SymbolInfo
-        //    {
-        //        Code = "4444",
-        //        Symbol = '4',
-        //    }
-        //};
-        //si = OrderBy(si, temp);
-
-        //Debug.LogFormat(string.Join(", ", si.Select(x => x.Code).ToArray()));
-        //Debug.LogFormat(string.Join(", ", si.Select(x => x.Symbol.ToString()).ToArray()));
-        
+    {        
         for (int i = 0; i < symbols.Length; ++i)
         {
             Symbols.Add(new SymbolInfo
@@ -176,11 +147,53 @@ public class UnicodeScript : MonoBehaviour
             sortOrder = new List<int> { 1, 3, 4, 2 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
+        else if (WhenAllConcatinated())
+        {
+            sortOrder = new List<int> { 2, 3, 1, 4 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
+        }
+        else if(IsDigitsOrLettersOnly())
+        {
+            sortOrder = new List<int> { 3, 2, 1, 4 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
+        }
+        else
+        {
+            sortOrder = new List<int> { 4, 2, 1, 3 };
+            SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
+        }
     }
 
     private void HandlePress (int index)
     {
         Debug.LogFormat(index.ToString());
+    }
+
+    private bool IsDigitsOrLettersOnly()
+    {
+        var codes = SelectedSymbols.Select(x => x.Code).ToArray();
+
+        for(int i = 0; i < 4; ++i)
+        {
+            foreach(char c in codes[i])
+            {
+                if (c < '0' || c > '9')
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private bool WhenAllConcatinated()
+    {
+        var concatinatedString = string.Join("", SelectedSymbols.Select(x => x.Code).ToArray());
+        if (concatinatedString.Contains("1A") || concatinatedString.Contains("2B") || concatinatedString.Contains("3C") || concatinatedString.Contains("4D") || concatinatedString.Contains("5E") || concatinatedString.Contains("6F"))
+        {
+            return true;
+        }
+        return false;
     }
 
     private bool Has2B()
