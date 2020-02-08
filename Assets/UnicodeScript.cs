@@ -67,6 +67,13 @@ public class UnicodeScript : MonoBehaviour
 
         UPlusButton.OnInteract += delegate
          {
+             Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
+             UPlusButton.AddInteractionPunch(.1f);
+
+             if (isSolved)
+             {
+                 return false;
+             }
              if (!UPlusButtonPressed)
              {
                  AddToTextArray("U+", false);
@@ -77,9 +84,15 @@ public class UnicodeScript : MonoBehaviour
 
         for(int i = 0; i < Buttons.Length; ++i)
         {
-            var index = i;
+            var index = i;          
             Buttons[index].OnInteract += delegate
             {
+                Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
+                UPlusButton.AddInteractionPunch(.1f);
+                if (isSolved)
+                {
+                    return false;
+                }
                 HandlePress(index);
                 return false;
             };
@@ -412,7 +425,9 @@ public class UnicodeScript : MonoBehaviour
                 yield return new WaitForSecondsRealtime(.1f);
             }
             Module.HandleStrike();
-
+            yield return new WaitForSecondsRealtime(.5f);
+            TextArray.text = "";
+            AddToTextArray("", true);
         }
     }
 
