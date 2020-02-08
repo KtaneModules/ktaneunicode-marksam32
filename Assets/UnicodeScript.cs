@@ -23,12 +23,19 @@ public class UnicodeScript : MonoBehaviour
     private IList<SymbolInfo> SelectedSymbols = new List<SymbolInfo>();
 
     private readonly char[] symbols = new char[44] { '§', '¶', 'Ħ', 'Ӕ', 'ſ', 'Ƕ', 'Ƿ', '⁂', 'ͼ', 'ς', 'Ћ', '₪', 'Ю', 'Ѡ', 'Ѭ', '₰', '∯', '∫', '╩', 'Ӭ', '☊', '֍', '☦', 'ﬡ', 'ш', 'Ω', 'փ', '▒', '╋', '⌘', '∴', '∅', '℄', 'Ҩ', '★', 'ƛ', 'Ϫ', 'ت', 'ټ', 'غ', 'ں', 'þ', 'Ɣ', 'ȹ' };
-    private readonly string[] codes = new string[44] { "00A7", "00B6", "0126", "04D4", "017F", "01F6", "01F7", "2042", "037C", "03C2", "040B", "20AA", "042E", "0460", "046C", "20B0", "222F", "222B", "2569", "04EC", "260A", "058D", "2626", "FB21", "0448", "03A9", "0583", "2592", "254B", "2318", "2234", "2205", "2104", "04A8", "2605", "019B", "03EA", "062A", "067C", "063A", "06BA", "00FE", "0194", "0239" };
+    private readonly string[] codes = new string[44] { "00A7", "00B6", "0126", "04D4", "017F", "01F6", "01F7", "2042", "037C", "03C2", "040B", "20AA", "042E", "0460", "046C", "20B0", "222F", "222B", "2569", "04EC", "260A", "058D", "2626", "FB21", "0428", "03A9", "0583", "2592", "254B", "2318", "2234", "2205", "2104", "04A8", "2605", "019B", "03EA", "062A", "067C", "063A", "06BA", "00FE", "0194", "0239" };
     private List<char> DisplaySymbols = new List<char>();
+
+    private List<char> PressedButtons = new List<char>();
+    private int stage = 1;
 
     private static int _moduleIdCounter = 1; 
     private int _moduleId = 0;
     private bool isSolved = false;
+
+    private string DispayedText;
+
+    private bool UPlusButtonPressed = false;
 
     private static readonly List<char> AllowedSerialNumberLetters = new List<char> { 'a', 'b', 'c', 'd', 'e', 'f' };
 
@@ -60,7 +67,11 @@ public class UnicodeScript : MonoBehaviour
 
         UPlusButton.OnInteract += delegate
          {
-             StartCoroutine("SolveAnimation", true);
+             if (!UPlusButtonPressed)
+             {
+                 AddToTextArray("U+", false);
+             }
+             UPlusButtonPressed = true;
              return false;
          };
 
@@ -99,66 +110,79 @@ public class UnicodeScript : MonoBehaviour
         List<int> sortOrder = new List<int>();
         if (Info.GetBatteryCount() == 2 && Info.IsIndicatorOn(Indicator.BOB) && SelectedSymbols.Any(x => x.Code.Contains("0")) && Has2B())
         {
+            Debug.LogFormat("Rule 1 is true");
             sortOrder = new List<int> { 1, 2, 3, 4 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
-        else if (SelectedSymbols[2].Code.Contains("A") || SelectedSymbols[2].Code.Contains("B") || SelectedSymbols[2].Code.Contains("C"))
+        else if (SelectedSymbols[2].Code.Contains("A") || SelectedSymbols[2].Code.Contains("B"))
         {
+            Debug.LogFormat("Rule 2 is true");
             sortOrder = new List<int> { 3, 4, 2, 1 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
-        else if (SelectedSymbols[1].Code.Contains("1") || SelectedSymbols[1].Code.Contains("2") || SelectedSymbols[1].Code.Contains("3"))
+        else if (SelectedSymbols[1].Code.Contains("1") || SelectedSymbols[1].Code.Contains("2"))
         {
+            Debug.LogFormat("Rule 3 is true");
             sortOrder = new List<int> { 3, 1, 4, 2 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (NumberOfDEFEven() ^ Info.GetPortCount() % 2 == 0)
         {
+            Debug.LogFormat("Rule 4 is true");
             sortOrder = new List<int> { 2, 4, 1, 3 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (OddDigitsGraterThanFive())
         {
+            Debug.LogFormat("Rule 5 is true");
             sortOrder = new List<int> { 1, 2, 4, 3 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (FirstSymbolHexValue())
         {
+            Debug.LogFormat("Rule 6 is true");
             sortOrder = new List<int> { 4, 3, 2, 1 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (EdgeworkIsGraterThanDigits())
         {
+            Debug.LogFormat("Rule 7 is true");
             sortOrder = new List<int> { 1, 4, 3, 2 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (!SelectedSymbols[3].Code.Contains(Info.GetSerialNumberNumbers().Last().ToString()))
         {
+            Debug.LogFormat("Rule 8 is true");
             sortOrder = new List<int> { 2, 3, 4, 1 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (HasInCommonWithSerialNumber())
         {
+            Debug.LogFormat("Rule 10 is true");
             sortOrder = new List<int> { 4, 1, 2, 3 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (DigitsGraterThatLetters())
         {
+            Debug.LogFormat("Rule 11 is true");
             sortOrder = new List<int> { 1, 3, 4, 2 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (WhenAllConcatinated())
         {
+            Debug.LogFormat("Rule 12 is true");
             sortOrder = new List<int> { 2, 3, 1, 4 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if(IsDigitsOrLettersOnly())
         {
+            Debug.LogFormat("Rule 13 is true");
             sortOrder = new List<int> { 3, 2, 1, 4 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else
         {
+            Debug.LogFormat("Rule 14 is true");
             sortOrder = new List<int> { 4, 2, 1, 3 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
@@ -166,7 +190,103 @@ public class UnicodeScript : MonoBehaviour
 
     private void HandlePress (int index)
     {
-        Debug.LogFormat(index.ToString());
+        if (UPlusButtonPressed)
+        {          
+            switch (index)
+            {
+                case 0:
+                    PressedButtons.Add('0');
+                    AddToTextArray("0", false);
+                    break;
+                case 1:
+                    PressedButtons.Add('1');
+                    AddToTextArray("1", false);
+                    break;
+                case 2:
+                    PressedButtons.Add('2');
+                    AddToTextArray("2", false);
+                    break;
+                case 3:
+                    PressedButtons.Add('3');
+                    AddToTextArray("3", false);
+                    break;
+                case 4:
+                    PressedButtons.Add('4');
+                    AddToTextArray("4", false);
+                    break;
+                case 5:
+                    PressedButtons.Add('5');
+                    AddToTextArray("5", false);
+                    break;
+                case 6:
+                    PressedButtons.Add('6');
+                    AddToTextArray("6", false);
+                    break;
+                case 7:
+                    PressedButtons.Add('7');
+                    AddToTextArray("7", false);
+                    break;
+                case 8:
+                    PressedButtons.Add('8');
+                    AddToTextArray("8", false);
+                    break;
+                case 9:
+                    PressedButtons.Add('9');
+                    AddToTextArray("9", false);
+                    break;
+                case 10:
+                    PressedButtons.Add('A');
+                    AddToTextArray("A", false);
+                    break;
+                case 11:
+                    PressedButtons.Add('B');
+                    AddToTextArray("B", false);
+                    break;
+                case 12:
+                    PressedButtons.Add('C');
+                    AddToTextArray("C", false);
+                    break;
+                case 13:
+                    PressedButtons.Add('D');
+                    AddToTextArray("D", false);
+                    break;
+                case 14:
+                    PressedButtons.Add('E');
+                    AddToTextArray("E", false);
+                    break;
+                default:
+                    PressedButtons.Add('F');
+                    AddToTextArray("F", false);
+                    break;
+            }
+            if (PressedButtons.ToArray().Length == 4)
+            {
+                UPlusButtonPressed = false;
+                if (SelectedSymbols[stage - 1].Code == string.Join("", PressedButtons.Select(x => x.ToString()).ToArray()))
+                {
+                    Debug.LogFormat("that is correct");
+                    Debug.LogFormat("stage: {0} passed", stage);
+                    if(stage == 4)
+                    {
+                        StartCoroutine("SolveAnimation", true);
+                    }
+                    else
+                    {
+                        stage++;
+                        Debug.LogFormat("Start of stage {0} ", stage);
+                        AddToTextArray(" ", false);
+                        PressedButtons.Clear();
+                    }
+                }
+                else
+                {
+                    Debug.LogFormat("Wrong");
+                    PressedButtons.Clear();
+                    stage = 1;
+                    StartCoroutine("SolveAnimation", false);
+                }
+            }
+        }
     }
 
     private bool IsDigitsOrLettersOnly()
@@ -266,11 +386,10 @@ public class UnicodeScript : MonoBehaviour
 
     private IEnumerator SolveAnimation(bool correct)
     {
-        TextArray.text = "";
-
-        yield return new WaitForSecondsRealtime(.1f);
         if (correct)
         {
+            isSolved = true;
+            yield return new WaitForSecondsRealtime(.1f);
             var CorrectTextChar = CorrectText.ToCharArray();
             string text = "";
             for (int i = 0; i < CorrectTextChar.Length; ++i)
@@ -279,9 +398,11 @@ public class UnicodeScript : MonoBehaviour
                 TextArray.text = text;
                 yield return new WaitForSecondsRealtime(.1f);
             }
+            Module.HandlePass();
         }
         else
         {
+            yield return new WaitForSecondsRealtime(.1f);
             var WrongTextChar = WrongText.ToCharArray();
             string text = "";
             for (int i = 0; i < WrongTextChar.Length; ++i)
@@ -290,6 +411,8 @@ public class UnicodeScript : MonoBehaviour
                 TextArray.text = text;
                 yield return new WaitForSecondsRealtime(.1f);
             }
+            Module.HandleStrike();
+
         }
     }
 
@@ -298,9 +421,23 @@ public class UnicodeScript : MonoBehaviour
         return order.Select(x => selectedSymbols[x -1]).ToList();
     }
 
+    private void AddToTextArray(string add, bool clear)
+    {
+        if (clear)
+        {
+            DispayedText = "";
+            TextArray.text = DispayedText;          
+        }
+        else
+        {
+            DispayedText = DispayedText + add;
+            TextArray.text = DispayedText;
+        }      
+    }
+
 	// Update is called once per frame
 	void Update ()
     {
-		
+
 	}
 }
