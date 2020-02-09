@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections;
 using KModkit;
 using System;
+using System.Text.RegularExpressions;
 
 public class UnicodeScript : MonoBehaviour
 {
@@ -32,8 +33,9 @@ public class UnicodeScript : MonoBehaviour
     private static int _moduleIdCounter = 1; 
     private int _moduleId = 0;
     private bool isSolved = false;
+    private bool Interactable = true;
 
-    private string DispayedText;
+    private string DisplayedText;
 
     private bool UPlusButtonPressed = false;
 
@@ -41,6 +43,10 @@ public class UnicodeScript : MonoBehaviour
 
     private readonly string CorrectText = "That is correct, good job! :D";
     private readonly string WrongText = "That is incorrect, bad job! D:";
+
+    private bool TPStrike = false;
+
+    private readonly static Regex TwitchPlaysRegex = new Regex("^submit ([0-9 a-f]{4}) ([0-9 a-f]{4}) ([0-9 a-f]{4}) ([0-9 a-f]{4})$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
     // Use this for initialization
     void Start()
@@ -70,7 +76,7 @@ public class UnicodeScript : MonoBehaviour
              Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
              UPlusButton.AddInteractionPunch(.1f);
 
-             if (isSolved)
+             if (isSolved || !Interactable)
              {
                  return false;
              }
@@ -89,7 +95,7 @@ public class UnicodeScript : MonoBehaviour
             {
                 Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
                 UPlusButton.AddInteractionPunch(.1f);
-                if (isSolved)
+                if (isSolved || !Interactable)
                 {
                     return false;
                 }
@@ -139,7 +145,7 @@ public class UnicodeScript : MonoBehaviour
             sortOrder = new List<int> { 3, 1, 4, 2 };
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
-        else if (NumberOfDEFEven() ^ Info.GetPortCount() % 2 == 0)
+        else if (NumberOfDEFEven() ^ Info.GetPortCount() % 2 != 0)
         {
             Debug.LogFormat("Rule 4 is true");
             sortOrder = new List<int> { 2, 4, 1, 3 };
@@ -399,6 +405,7 @@ public class UnicodeScript : MonoBehaviour
 
     private IEnumerator SolveAnimation(bool correct)
     {
+        Interactable = false;
         if (correct)
         {
             isSolved = true;
@@ -415,6 +422,7 @@ public class UnicodeScript : MonoBehaviour
         }
         else
         {
+            TPStrike = true;
             yield return new WaitForSecondsRealtime(.1f);
             var WrongTextChar = WrongText.ToCharArray();
             string text = "";
@@ -428,7 +436,9 @@ public class UnicodeScript : MonoBehaviour
             yield return new WaitForSecondsRealtime(.5f);
             TextArray.text = "";
             AddToTextArray("", true);
+            TPStrike = false;
         }
+        Interactable = true;
     }
 
     private static IList<SymbolInfo> OrderBy(IList<SymbolInfo> selectedSymbols, IList<int> order)
@@ -440,18 +450,92 @@ public class UnicodeScript : MonoBehaviour
     {
         if (clear)
         {
-            DispayedText = "";
-            TextArray.text = DispayedText;          
+            DisplayedText = "";
+            TextArray.text = DisplayedText;          
         }
         else
         {
-            DispayedText = DispayedText + add;
-            TextArray.text = DispayedText;
+            DisplayedText = DisplayedText + add;
+            TextArray.text = DisplayedText;
         }      
     }
 
-	// Update is called once per frame
-	void Update ()
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = "!{0} press 1234. Reading order.";
+#pragma warning restore 414
+
+    public IEnumerator ProcessTwitchCommand(string command)
+    {
+        command = command.ToLowerInvariant().Trim();
+        Match m = TwitchPlaysRegex.Match(command);
+
+        if (m.Success)
+        {
+            yield return null;
+            for(int i = 0; i < 4; ++i)
+            {
+                Debug.LogFormat(m.Groups[i + 1].ToString());
+                UPlusButton.OnInteract();
+                int[] group = GroupToInt(m.Groups[i + 1].ToString().ToCharArray());
+                for(int x = 0; x < 4; ++x)
+                {
+                    Buttons[group[x]].OnInteract();
+                    yield return new WaitForSecondsRealtime(.1f);
+                }
+                if (TPStrike)
+                {
+                    yield return "strike";
+                    yield break;
+                }
+            }
+                
+        }
+        if (isSolved)
+        {
+            yield return "solve";
+        }
+        yield break;
+    }
+
+    private int[] GroupToInt(char[] group)
+    {
+        List<int> indexes = new List<int>();
+        Debug.LogFormat(group[0].ToString());
+        for(int i = 0; i < 4; ++i)
+        {
+            switch (group[i])
+            {
+                case 'a':
+                    indexes.Add(10);
+                    Debug.LogFormat("yeeeeet");
+                    break;
+                case 'b':
+                    indexes.Add(11);
+                    break;
+                case 'c':
+                    indexes.Add(12);
+                    break;
+                case 'd':
+                    indexes.Add(13);
+                    break;
+                case 'e':
+                    indexes.Add(14);
+                    break;
+                case 'f':
+                    indexes.Add(15);
+                    break;
+                default:
+                    indexes.Add(int.Parse(group[i].ToString()));
+                    break;
+            }
+        }
+        Debug.LogFormat(string.Join(", ", indexes.Select(x => x.ToString()).ToArray()));
+        return indexes.ToArray();
+        
+    }
+
+    // Update is called once per frame
+    void Update ()
     {
 
 	}
