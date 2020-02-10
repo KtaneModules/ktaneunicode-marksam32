@@ -315,15 +315,16 @@ public class UnicodeScript : MonoBehaviour
 
         for(int i = 0; i < 4; ++i)
         {
-            foreach(char c in codes[i])
+            if (codes[i].All(char.IsLetter))
             {
-                if (c < '0' || c > '9')
-                {
-                    return false;
-                }
+                return true;
+            }
+            if (codes[i].All(char.IsDigit))
+            {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private bool WhenAllConcatinated()
@@ -420,6 +421,7 @@ public class UnicodeScript : MonoBehaviour
                 yield return new WaitForSecondsRealtime(.1f);
             }
             Module.HandlePass();
+            Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
         }
         else
         {
@@ -462,7 +464,7 @@ public class UnicodeScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "Submit your answer by entering !{0} 1234 abcd 1234 abcd";
+    private readonly string TwitchHelpMessage = "Submit your answer by entering !{0} 1234 abcd 1234 abcd.";
 #pragma warning restore 414
 
     public IEnumerator ProcessTwitchCommand(string command)
@@ -475,6 +477,7 @@ public class UnicodeScript : MonoBehaviour
             yield return null;
             if (!Interactable)
             {
+                yield return string.Format("sendtochaterror Please wait until the solve/strike animation is over!");
                 yield break;
             }
             for(int i = 0; i < 4; ++i)
@@ -531,8 +534,7 @@ public class UnicodeScript : MonoBehaviour
                     break;
             }
         }
-        return indexes.ToArray();
-        
+        return indexes.ToArray();  
     }
 
     // Update is called once per frame
