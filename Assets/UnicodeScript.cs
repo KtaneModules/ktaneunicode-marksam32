@@ -6,6 +6,7 @@ using System.Collections;
 using KModkit;
 using System;
 using System.Text.RegularExpressions;
+using rnd = UnityEngine.Random;
 
 public class UnicodeScript : MonoBehaviour
 {
@@ -44,6 +45,8 @@ public class UnicodeScript : MonoBehaviour
     private readonly string CorrectText = "That is correct, good job! :D";
     private readonly string WrongText = "That is incorrect, bad job! D:";
 
+    private readonly string[] SolveTexts = { "Nice", "Neat", "Good", "Okay" }; 
+
     private bool TPStrike = false;
 
     private readonly static Regex TwitchPlaysRegex = new Regex("^submit ([0-9 a-f]{4}) ([0-9 a-f]{4}) ([0-9 a-f]{4}) ([0-9 a-f]{4})$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
@@ -66,12 +69,16 @@ public class UnicodeScript : MonoBehaviour
 
     void Activate()
     {
+        TextArray.text = "";
         for (int i = 0; i < 4; ++i)
         {
             SymbolsScreen[i].text = DisplaySymbols[i].ToString();
         }
+    
         Debug.LogFormat("[Unicode #{0}] The symbols are: {1}. and the codes are: {2}", _moduleId, string.Join(", ", SelectedSymbols.Select(x => x.Symbol.ToString()).ToArray()), string.Join(", ", SelectedSymbols.Select(x => x.Code).ToArray()));
+
         ApplyRules();
+
         Debug.LogFormat("[Unicode #{0}] The symbols in the correct order are: {1}. and the codes are: {2}", _moduleId, string.Join(", ", SelectedSymbols.Select(x => x.Symbol.ToString()).ToArray()), string.Join(", ", SelectedSymbols.Select(x => x.Code).ToArray()));
         UPlusButton.OnInteract += delegate
          {
@@ -422,6 +429,12 @@ public class UnicodeScript : MonoBehaviour
             }
             Module.HandlePass();
             Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.CorrectChime, transform);
+            var selectedMessage = SolveTexts[rnd.Range(0, SolveTexts.Length)].ToCharArray();
+            for (int i = 0; i < 4; ++i)
+            {
+                SymbolsScreen[i].text = selectedMessage[i].ToString();
+                yield return new WaitForSecondsRealtime(.2f);
+            }
         }
         else
         {
