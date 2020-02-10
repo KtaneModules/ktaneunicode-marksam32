@@ -72,7 +72,7 @@ public class UnicodeScript : MonoBehaviour
         }
         Debug.LogFormat("[Unicode #{0}] The symbols are: {1}. and the codes are: {2}", _moduleId, string.Join(", ", SelectedSymbols.Select(x => x.Symbol.ToString()).ToArray()), string.Join(", ", SelectedSymbols.Select(x => x.Code).ToArray()));
         ApplyRules();
-        Debug.LogFormat("[Unicode #{0}] The symbols the correct correct are: {1}. and the codes are: {2}", _moduleId, string.Join(", ", SelectedSymbols.Select(x => x.Symbol.ToString()).ToArray()), string.Join(", ", SelectedSymbols.Select(x => x.Code).ToArray()));
+        Debug.LogFormat("[Unicode #{0}] The symbols in the correct order are: {1}. and the codes are: {2}", _moduleId, string.Join(", ", SelectedSymbols.Select(x => x.Symbol.ToString()).ToArray()), string.Join(", ", SelectedSymbols.Select(x => x.Code).ToArray()));
         UPlusButton.OnInteract += delegate
          {
              Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
