@@ -70,7 +70,9 @@ public class UnicodeScript : MonoBehaviour
         {
             SymbolsScreen[i].text = DisplaySymbols[i].ToString();
         }
-
+        Debug.LogFormat("[Unicode #{0}] The symbols are: {1}. and the codes are: {2}", _moduleId, string.Join(", ", SelectedSymbols.Select(x => x.Symbol.ToString()).ToArray()), string.Join(", ", SelectedSymbols.Select(x => x.Code).ToArray()));
+        ApplyRules();
+        Debug.LogFormat("[Unicode #{0}] The symbols the correct correct are: {1}. and the codes are: {2}", _moduleId, string.Join(", ", SelectedSymbols.Select(x => x.Symbol.ToString()).ToArray()), string.Join(", ", SelectedSymbols.Select(x => x.Code).ToArray()));
         UPlusButton.OnInteract += delegate
          {
              Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
@@ -121,7 +123,6 @@ public class UnicodeScript : MonoBehaviour
         {
             DisplaySymbols.Add(SelectedSymbols[i].Symbol);
         }
-        ApplyRules();
     }
 
     private void ApplyRules()
@@ -129,80 +130,80 @@ public class UnicodeScript : MonoBehaviour
         List<int> sortOrder = new List<int>();
         if (Info.GetBatteryCount() == 2 && Info.IsIndicatorOn(Indicator.BOB) && SelectedSymbols.Any(x => x.Code.Contains("0")) && Has2B())
         {
-            Debug.LogFormat("Rule 1 is true");
             sortOrder = new List<int> { 1, 2, 3, 4 };
+            Debug.LogFormat("[Unicode #{0}] Rule 1 applies. Sort order is 1 2 3 4.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (SelectedSymbols[2].Code.Contains("A") || SelectedSymbols[2].Code.Contains("B"))
         {
-            Debug.LogFormat("Rule 2 is true");
             sortOrder = new List<int> { 3, 4, 2, 1 };
+            Debug.LogFormat("[Unicode #{0}] Rule 2 applies. Sort order is 3 4 2 1.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (SelectedSymbols[1].Code.Contains("1") || SelectedSymbols[1].Code.Contains("2"))
         {
-            Debug.LogFormat("Rule 3 is true");
             sortOrder = new List<int> { 3, 1, 4, 2 };
+            Debug.LogFormat("[Unicode #{0}] Rule 3 applies. Sort order is 3 1 2 4.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (NumberOfDEFEven() ^ Info.GetPortCount() % 2 != 0)
         {
-            Debug.LogFormat("Rule 4 is true");
             sortOrder = new List<int> { 2, 4, 1, 3 };
+            Debug.LogFormat("[Unicode #{0}] Rule 4 applies. Sort order is 2 4 1 3.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (OddDigitsGraterThanFive())
         {
-            Debug.LogFormat("Rule 5 is true");
             sortOrder = new List<int> { 1, 2, 4, 3 };
+            Debug.LogFormat("[Unicode #{0}] Rule 5 applies. Sort order is 1 2 4 3.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (FirstSymbolHexValue())
         {
-            Debug.LogFormat("Rule 6 is true");
             sortOrder = new List<int> { 4, 3, 2, 1 };
+            Debug.LogFormat("[Unicode #{0}] Rule 6 applies. Sort order is 4 3 2 1.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (EdgeworkIsGraterThanDigits())
         {
-            Debug.LogFormat("Rule 7 is true");
             sortOrder = new List<int> { 1, 4, 3, 2 };
+            Debug.LogFormat("[Unicode #{0}] Rule 7 applies. Sort order is 1 4 3 2.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (!SelectedSymbols[3].Code.Contains(Info.GetSerialNumberNumbers().Last().ToString()))
         {
-            Debug.LogFormat("Rule 8 is true");
             sortOrder = new List<int> { 2, 3, 4, 1 };
+            Debug.LogFormat("[Unicode #{0}] Rule 8 applies. Sort order is 2 3 4 1.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (HasInCommonWithSerialNumber())
         {
-            Debug.LogFormat("Rule 10 is true");
             sortOrder = new List<int> { 4, 1, 2, 3 };
+            Debug.LogFormat("[Unicode #{0}] Rule 10 applies. Sort order is 4 1 2 3.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (DigitsGraterThatLetters())
         {
-            Debug.LogFormat("Rule 11 is true");
             sortOrder = new List<int> { 1, 3, 4, 2 };
+            Debug.LogFormat("[Unicode #{0}] Rule 11 applies. Sort order is 1 3 4 2.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (WhenAllConcatinated())
         {
-            Debug.LogFormat("Rule 12 is true");
             sortOrder = new List<int> { 2, 3, 1, 4 };
+            Debug.LogFormat("[Unicode #{0}] Rule 12 applies. Sort order is 2 3 1 4.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if(IsDigitsOrLettersOnly())
         {
-            Debug.LogFormat("Rule 13 is true");
             sortOrder = new List<int> { 3, 2, 1, 4 };
+            Debug.LogFormat("[Unicode #{0}] Rule 13 applies. Sort order is 3 2 1 4.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else
         {
-            Debug.LogFormat("Rule 14 is true");
             sortOrder = new List<int> { 4, 2, 1, 3 };
+            Debug.LogFormat("[Unicode #{0}] Rule 14 applies. Sort order is 4 2 1 3.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
     }
@@ -283,23 +284,23 @@ public class UnicodeScript : MonoBehaviour
                 UPlusButtonPressed = false;
                 if (SelectedSymbols[stage - 1].Code == string.Join("", PressedButtons.Select(x => x.ToString()).ToArray()))
                 {
-                    Debug.LogFormat("that is correct");
-                    Debug.LogFormat("stage: {0} passed", stage);
                     if(stage == 4)
                     {
+                        Debug.LogFormat("[Unicode #{0}] Entered: {1}. That is correct.", _moduleId, string.Join("", PressedButtons.Select(x => x.ToString()).ToArray()));
+                        Debug.LogFormat("[Unicode #{0}] Module solved.", _moduleId);
                         StartCoroutine("SolveAnimation", true);
                     }
                     else
                     {
+                        Debug.LogFormat("[Unicode #{0}] Entered: {1}. That is correct.", _moduleId, string.Join("", PressedButtons.Select(x => x.ToString()).ToArray()));
                         stage++;
-                        Debug.LogFormat("Start of stage {0} ", stage);
                         AddToTextArray(" ", false);
                         PressedButtons.Clear();
                     }
                 }
                 else
                 {
-                    Debug.LogFormat("Wrong");
+                    Debug.LogFormat("[Unicode #{0}] Entered: {1}. That is incorrect. Expected: {2}.", _moduleId, string.Join("", PressedButtons.Select(x => x.ToString()).ToArray()), SelectedSymbols[stage - 1].Code);
                     PressedButtons.Clear();
                     stage = 1;
                     StartCoroutine("SolveAnimation", false);
@@ -461,7 +462,7 @@ public class UnicodeScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "!{0} press 1234. Reading order.";
+    private readonly string TwitchHelpMessage = "Submit your answer by entering !{0} 1234 abcd 1234 abcd";
 #pragma warning restore 414
 
     public IEnumerator ProcessTwitchCommand(string command)
@@ -472,9 +473,12 @@ public class UnicodeScript : MonoBehaviour
         if (m.Success)
         {
             yield return null;
+            if (!Interactable)
+            {
+                yield break;
+            }
             for(int i = 0; i < 4; ++i)
             {
-                Debug.LogFormat(m.Groups[i + 1].ToString());
                 UPlusButton.OnInteract();
                 int[] group = GroupToInt(m.Groups[i + 1].ToString().ToCharArray());
                 for(int x = 0; x < 4; ++x)
@@ -500,14 +504,12 @@ public class UnicodeScript : MonoBehaviour
     private int[] GroupToInt(char[] group)
     {
         List<int> indexes = new List<int>();
-        Debug.LogFormat(group[0].ToString());
         for(int i = 0; i < 4; ++i)
         {
             switch (group[i])
             {
                 case 'a':
                     indexes.Add(10);
-                    Debug.LogFormat("yeeeeet");
                     break;
                 case 'b':
                     indexes.Add(11);
@@ -529,7 +531,6 @@ public class UnicodeScript : MonoBehaviour
                     break;
             }
         }
-        Debug.LogFormat(string.Join(", ", indexes.Select(x => x.ToString()).ToArray()));
         return indexes.ToArray();
         
     }
