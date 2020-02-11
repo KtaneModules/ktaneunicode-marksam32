@@ -45,7 +45,7 @@ public class UnicodeScript : MonoBehaviour
     private readonly string CorrectText = "That is correct, good job! :D";
     private readonly string WrongText = "That is incorrect, bad job! D:";
 
-    private readonly string[] SolveTexts = { "Nice", "Neat", "Good", "Okay" }; 
+    private readonly string[] SolveTexts = { "Nice", "Neat", "Good", "Okay", "Cool" }; 
 
     private bool TPStrike = false;
 
@@ -83,7 +83,7 @@ public class UnicodeScript : MonoBehaviour
         UPlusButton.OnInteract += delegate
          {
              Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
-             UPlusButton.AddInteractionPunch(.1f);
+             UPlusButton.AddInteractionPunch(.3f);
 
              if (isSolved || !Interactable)
              {
@@ -103,7 +103,7 @@ public class UnicodeScript : MonoBehaviour
             Buttons[index].OnInteract += delegate
             {
                 Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
-                UPlusButton.AddInteractionPunch(.1f);
+                UPlusButton.AddInteractionPunch(.3f);
                 if (isSolved || !Interactable)
                 {
                     return false;
