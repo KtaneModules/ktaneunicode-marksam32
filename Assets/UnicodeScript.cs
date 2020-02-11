@@ -141,13 +141,13 @@ public class UnicodeScript : MonoBehaviour
             Debug.LogFormat("[Unicode #{0}] Rule 1 applies. Sort order is 1 2 3 4.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
-        else if (SelectedSymbols[2].Code.Contains("A") || SelectedSymbols[2].Code.Contains("B"))
+        else if (SelectedSymbols[2].Code.Contains("A"))
         {
             sortOrder = new List<int> { 3, 4, 2, 1 };
             Debug.LogFormat("[Unicode #{0}] Rule 2 applies. Sort order is 3 4 2 1.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
-        else if (SelectedSymbols[1].Code.Contains("1") || SelectedSymbols[1].Code.Contains("2"))
+        else if (SelectedSymbols[1].Code.Contains("1"))
         {
             sortOrder = new List<int> { 3, 1, 4, 2 };
             Debug.LogFormat("[Unicode #{0}] Rule 3 applies. Sort order is 3 1 2 4.", _moduleId);
