@@ -150,7 +150,7 @@ public class UnicodeScript : MonoBehaviour
         else if (SelectedSymbols[1].Code.Contains("1"))
         {
             sortOrder = new List<int> { 3, 1, 4, 2 };
-            Debug.LogFormat("[Unicode #{0}] Rule 3 applies. Sort order is 3 1 2 4.", _moduleId);
+            Debug.LogFormat("[Unicode #{0}] Rule 3 applies. Sort order is 3 1 4 2.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
         else if (NumberOfDEFEven() ^ Info.GetPortCount() % 2 != 0)
