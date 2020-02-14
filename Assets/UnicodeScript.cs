@@ -477,7 +477,7 @@ public class UnicodeScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = "Submit your answer by entering !{0} 1234 abcd 1234 abcd.";
+    private readonly string TwitchHelpMessage = "Submit your answer by entering !{0} submit 1234 abcd 1234 abcd.";
 #pragma warning restore 414
 
     public IEnumerator ProcessTwitchCommand(string command)
