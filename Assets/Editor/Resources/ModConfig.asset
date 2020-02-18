@@ -16,9 +16,9 @@ MonoBehaviour:
   author: Marksam32, Danny7007
   description: "What is it? And why do we need it?\n\r\nIdeas by: Danny7007\nCreated
     and impelemented by: Marksam32\r\nTwitch plays is supported.\r\n\r\nManual:\r\nPDF:
-    https://github.com/marksam32/ktaneUnicode/blob/master/Manual/pdfs/Modules/Unicode%20%E2%80%94%20Keep%20Talking%20and%20Nobody%20Explodes%20Module.pdf
-    \nHTML: (Soon)\n\r\nModule id: UnicodeModule\nGithub: https://github.com/marksam32/ktaneunicode\n\r\nIf
-    you want to report any bugs or typos in the manual or in the module, please contact
+    https://ktane.timwi.de/PDF/Unicode.pdf\nHTML: https://ktane.timwi.de/HTML/Unicode.html\n\r\nModule
+    id: UnicodeModule\nGithub: https://github.com/marksam32/ktaneunicode\n\r\nIf you
+    want to report any bugs or typos in the manual or in the module, please contact
     me on discord: Marksam32#8326"
   version: 1.0
   outputFolder: build

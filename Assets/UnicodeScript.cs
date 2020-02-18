@@ -380,7 +380,7 @@ public class UnicodeScript : MonoBehaviour
         NumberOfE = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "E".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
         NumberOfF = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "F".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
 
-        return NumberOfD + NumberOfE + NumberOfF % 2 == 0;
+        return (NumberOfD + NumberOfE + NumberOfF) % 2 == 0;
     }
 
     private bool OddDigitsGraterThanFive()
