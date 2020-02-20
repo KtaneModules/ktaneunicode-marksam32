@@ -189,7 +189,7 @@ public class UnicodeScript : MonoBehaviour
             Debug.LogFormat("[Unicode #{0}] Rule 10 applies. Sort order is 4 1 2 3.", _moduleId);
             SelectedSymbols = OrderBy(SelectedSymbols, sortOrder);
         }
-        else if (DigitsGraterThatLetters())
+        else if (DigitsLessThanLetters())
         {
             sortOrder = new List<int> { 1, 3, 4, 2 };
             Debug.LogFormat("[Unicode #{0}] Rule 11 applies. Sort order is 1 3 4 2.", _moduleId);
@@ -405,11 +405,11 @@ public class UnicodeScript : MonoBehaviour
         return edgework > symbolDigits;
     }
 
-    private bool DigitsGraterThatLetters()
+    private bool DigitsLessThanLetters()
     {
         int letters = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "A".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "B".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "C".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "D".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "E".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "F".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
         int digits = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "1".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "2".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "3".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "4".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "5".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "6".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "7".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "8".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "9".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase) || "0".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
-        return digits > letters;
+        return digits < letters;
     }
 
     private IEnumerator SolveAnimation(bool correct)
