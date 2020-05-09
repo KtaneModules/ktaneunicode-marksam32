@@ -20,15 +20,15 @@ public class UnicodeScript : MonoBehaviour
     public TextMesh[] SymbolsScreen;
     public TextMesh TextArray;
 
-    private IList<SymbolInfo> Symbols = new List<SymbolInfo>();
+    private readonly IList<SymbolInfo> Symbols = new List<SymbolInfo>();
 
     private IList<SymbolInfo> SelectedSymbols = new List<SymbolInfo>();
 
     private readonly char[] symbols = new char[44] { '§', '¶', 'Ħ', 'Ӕ', 'ſ', 'Ƕ', 'Ƿ', '⁂', 'ͼ', 'ς', 'Ћ', '₪', 'Ю', 'Ѡ', 'Ѭ', '₰', '∯', '∫', '╩', 'Ӭ', '☊', '֍', '☦', 'ﬡ', 'ш', 'Ω', 'փ', '▒', '╋', '⌘', '∴', '∅', '℄', 'Ҩ', '★', 'ƛ', 'Ϫ', 'ت', 'ټ', 'غ', 'ں', 'þ', 'Ɣ', 'ȹ' };
     private readonly string[] codes = new string[44] { "00A7", "00B6", "0126", "04D4", "017F", "01F6", "01F7", "2042", "037C", "03C2", "040B", "20AA", "042E", "0460", "046C", "20B0", "222F", "222B", "2569", "04EC", "260A", "058D", "2626", "FB21", "0428", "03A9", "0583", "2592", "254B", "2318", "2234", "2205", "2104", "04A8", "2605", "019B", "03EA", "062A", "067C", "063A", "06BA", "00FE", "0194", "0239" };
-    private List<char> DisplaySymbols = new List<char>();
+    private readonly List<char> DisplaySymbols = new List<char>();
 
-    private List<char> PressedButtons = new List<char>();
+    private readonly List<char> PressedButtons = new List<char>();
     private int stage = 1;
 
     private static int _moduleIdCounter = 1; 
@@ -134,7 +134,7 @@ public class UnicodeScript : MonoBehaviour
 
     private void ApplyRules()
     {
-        List<int> sortOrder = new List<int>();
+        List<int> sortOrder;
         if (Info.GetBatteryCount() == 2 && Info.IsIndicatorOn(Indicator.BOB) && SelectedSymbols.Any(x => x.Code.Contains("0")) && Has2B())
         {
             sortOrder = new List<int> { 1, 2, 3, 4 };
@@ -372,13 +372,9 @@ public class UnicodeScript : MonoBehaviour
 
     private bool NumberOfDEFEven()
     {
-        int NumberOfD;
-        int NumberOfE;
-        int NumberOfF;
-
-        NumberOfD = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "D".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
-        NumberOfE = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "E".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
-        NumberOfF = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "F".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
+        var NumberOfD = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "D".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
+        var NumberOfE = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "E".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
+        var NumberOfF = string.Join(string.Empty, SelectedSymbols.Select(x => x.Code).ToArray()).Count(x => "F".Equals(x.ToString(), StringComparison.InvariantCultureIgnoreCase));
 
         return (NumberOfD + NumberOfE + NumberOfF) % 2 == 0;
     }
@@ -515,6 +511,16 @@ public class UnicodeScript : MonoBehaviour
             yield return "solve";
         }
         yield break;
+    }
+
+    public IEnumerator TwitchHandleForcedSolve()
+    {
+        if(isSolved)
+            yield break;
+        Debug.LogFormat("[Unicode #{0}] Force solve requested by Twitch plays", _moduleId);
+        yield return ProcessTwitchCommand(string.Format("submit {0} {1} {2} {3}", SelectedSymbols[0].Code,
+            SelectedSymbols[1].Code, SelectedSymbols[2].Code, SelectedSymbols[3].Code));
+
     }
 
     private int[] GroupToInt(char[] group)
