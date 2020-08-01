@@ -34,6 +34,7 @@ public class UnicodeScript : MonoBehaviour
     private static int _moduleIdCounter = 1; 
     private int _moduleId = 0;
     private bool isSolved = false;
+    private bool isSolvedBeforeAnimation = false;
     private bool Interactable = true;
 
     private string DisplayedText;
@@ -85,7 +86,7 @@ public class UnicodeScript : MonoBehaviour
              Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
              UPlusButton.AddInteractionPunch(.3f);
 
-             if (isSolved || !Interactable)
+             if (isSolvedBeforeAnimation || !Interactable)
              {
                  return false;
              }
@@ -104,7 +105,7 @@ public class UnicodeScript : MonoBehaviour
             {
                 Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
                 UPlusButton.AddInteractionPunch(.3f);
-                if (isSolved || !Interactable)
+                if (isSolvedBeforeAnimation || !Interactable)
                 {
                     return false;
                 }
@@ -413,7 +414,7 @@ public class UnicodeScript : MonoBehaviour
         Interactable = false;
         if (correct)
         {
-            isSolved = true;
+            isSolvedBeforeAnimation = true;
             yield return new WaitForSecondsRealtime(.1f);
             var CorrectTextChar = CorrectText.ToCharArray();
             string text = "";
@@ -431,6 +432,8 @@ public class UnicodeScript : MonoBehaviour
                 SymbolsScreen[i].text = selectedMessage[i].ToString();
                 yield return new WaitForSecondsRealtime(.2f);
             }
+
+            isSolved = true;
         }
         else
         {
@@ -492,7 +495,7 @@ public class UnicodeScript : MonoBehaviour
             for(int i = 0; i < 4; ++i)
             {
                 UPlusButton.OnInteract();
-                int[] group = GroupToInt(m.Groups[i + 1].ToString().ToCharArray());
+                int[] group = GroupToInt(m.Groups[i + 1].ToString());
                 for(int x = 0; x < 4; ++x)
                 {
                     Buttons[group[x]].OnInteract();
@@ -506,7 +509,7 @@ public class UnicodeScript : MonoBehaviour
             }
                 
         }
-        if (isSolved)
+        if (isSolvedBeforeAnimation)
         {
             yield return "solve";
         }
@@ -515,20 +518,31 @@ public class UnicodeScript : MonoBehaviour
 
     public IEnumerator TwitchHandleForcedSolve()
     {
-        if(isSolved)
-            yield break;
-        Debug.LogFormat("[Unicode #{0}] Force solve requested by Twitch plays", _moduleId);
-        yield return ProcessTwitchCommand(string.Format("submit {0} {1} {2} {3}", SelectedSymbols[0].Code,
-            SelectedSymbols[1].Code, SelectedSymbols[2].Code, SelectedSymbols[3].Code));
+        for (var i = 0; i < 4; i++)
+        {
+            UPlusButton.OnInteract();
+            yield return new WaitForSeconds(.1f);
+            for (var j = 0; j < 4; j++)
+            {
+                Buttons[GroupToInt(SelectedSymbols[i].Code.ToLowerInvariant())[j]].OnInteract();
+                yield return new WaitForSeconds(.1f);
+            }
+            yield return true;
+        }
 
+        while (!isSolved)
+        {
+            yield return true;
+        }
     }
 
-    private int[] GroupToInt(char[] group)
+    private int[] GroupToInt(string group)
     {
+        var chararray = group.ToCharArray();
         List<int> indexes = new List<int>();
         for(int i = 0; i < 4; ++i)
         {
-            switch (group[i])
+            switch (chararray[i])
             {
                 case 'a':
                     indexes.Add(10);
